@@ -1,5 +1,6 @@
 // 
 //  Dependency :
+//      jQuery.js
 //      swfobject.js
 //
 
