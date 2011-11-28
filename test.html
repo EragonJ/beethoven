@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Test Beethoven</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script src="public/js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="public/js/swfobject.js" type="text/javascript" charset="utf-8"></script>
+<script src="beethoven.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+
+        var b = new Beethoven('mylGO27VqBU', 'ytapiplayer');
+    })
+</script>
+</head>
+<body>
+<div id="wrapper">
+  <div id="ytapiplayer">(Please update your flash version or try with another browser!)</div> 
+  <div id="sidebar">
+    <div id="playList"></div>
+    <div id="playBar">
+      <div class="controlButtons" id="first"></div>
+      <div class="controlButtons" id="previous"></div>
+      <div class="controlButtons" id="next"></div>
+      <div class="controlButtons" id="end"></div>
+      <div class="controlButtons" id="power"></div>
+      <div class="controlButtons" id="repeat"></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
