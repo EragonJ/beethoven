@@ -4,11 +4,36 @@
  *  Dependency :
  *      jQuery.js
  *      swfobject.js
+ *
+ *  Working Flow :
+ *      
+ *      ----------                                                 
+ *      | window |--- beethoven_ref ----> o
+ *      |---------
+ *
+ *      P.S. o is a beethoven instance, and window.beethoven_ref will be set up when o is initialized.
+ *
+ *      o <----------------------------------------------------------
+ *      |                                                           |
+ *      | If the clip is loaded                                     |
+ *      |                                                           |
+ *      v                                                           |                       
+ *     call onYouTubePlayerReady()                                  |
+ *      |                                                           |
+ *      |-- Set youtubePlayer property back through beethoven_ref ---
+ *
+ *          this.beethoven_ref.youtubePlayer = $('#'+ youtubePlayer_id ).get(0);
+ *                                                                 
+ *
  */
 
 var Beethoven = function( youtubeClip_id, youtubePlayer_id ) {
 
-    // properties 
+    // We need to make a reference from window to beethoven
+    // TODO: Remind that this global variable is reserved by Beethoven
+    window.beethoven_ref = this;
+
+    // Properties 
     this.currentSeconds = 0;
     this.youtubePlayer  = null;
     this.youtubeClipURL = '';
@@ -16,10 +41,9 @@ var Beethoven = function( youtubeClip_id, youtubePlayer_id ) {
     this.youtubeClip_id   = youtubeClip_id;
     this.youtubePlayer_id = youtubePlayer_id;
 
-
+    // Actions
     this.setYoutubeClipURL();
     this.embedYoutubePlayer();
-    this.setYoutubePlayer( youtubePlayer_id ) ;
 };
 
 // 
@@ -35,13 +59,6 @@ Beethoven.prototype = {
         }, {
             id : this.youtubePlayer_id
         });
-    },
-    
-    // Get the youtubePlayer instance and set the desired events to that
-    setYoutubePlayer : function( youtubePlayer_id ) {
-
-        this.youtubePlayer = $('#' + youtubePlayer_id ).get(0);
-        this.youtubePlayer.addEventListener('onStateChange', 'onYoutubeStateChange');
     },
 
     setYoutubeClipURL : function( ) {
@@ -64,15 +81,16 @@ Beethoven.prototype = {
 
 };
 
-function onYoutubeStateChange( state_code ) {
+// The API will call this function when the player is fully loaded and the API is ready to receive calls
+function onYouTubePlayerReady( youtubePlayer_id ) {
 
-    this.youtubePlayer = document.getElementById('ytapiplayer');
-    console.log( this.youtubePlayer.getCurrentTime() );
+    // this means window
+    this.beethoven_ref.youtubePlayer = $('#'+ youtubePlayer_id ).get(0);
+    this.beethoven_ref.youtubePlayer.addEventListener('onStateChange', 'onYoutubeStateChange');
 }
 
-// The API will call this function when the player is fully loaded and the API is ready to receive calls
-function onYouTubePlayerReady( player_id ) {
+function onYoutubeStateChange( state_code ) {
 
-    this.youtubePlayer = document.getElementById( player_id );
-    this.youtubePlayer.addEventListener('onStateChange', 'onYoutubeStateChange');
+    // this means window
+    console.log( this.beethoven_ref.youtubePlayer.getCurrentTime() );
 }
