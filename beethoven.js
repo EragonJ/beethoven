@@ -186,13 +186,16 @@ Beethoven.prototype = {
 
         if ( !this.isPerformable() ) return;
 
-        for (var i = 0; i < this.LRCobjs.length; i++ ) {
+        for (var i = 0; i < this.LRCobjs.length - 1; i++ ) {
 
-            var o = this.LRCobjs[i];
+            var leftObj  = this.LRCobjs[i];
+            var rightObj = this.LRCobjs[i + 1];
 
             // Find the FIRST lyric that timestamp is bigger than the current one
-            if ( this.currentTimestamp <= o['timestamp'] ) {
-                console.log( o['lyric'] );
+            if ( this.currentTimestamp >= leftObj['timestamp'] &&
+                 this.currentTimestamp < rightObj['timestamp'] ) {
+
+                console.log( leftObj['lyric'] );
                 break;
             }
         }
