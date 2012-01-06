@@ -29,10 +29,13 @@
  *      To test any of these calls, you must have your file running on a webserver,
  *      as the Flash player restricts calls between local files and the internet.
  *
+ *      XXX: It seems there is a small delay if you use timer to go through the interval (1s), 
+ *      then you will get different results not in 1s interval !!
+ *
  *
  */
 
-var Beethoven = function( youtubeClip_id, youtubePlayer_id ) {
+var Beethoven = function( youtubeClip_id, youtubePlayer_id, LRCobjs ) {
 
     // We need to make a reference from window to beethoven
     // TODO: Remind that this global variable is reserved by Beethoven
@@ -48,7 +51,7 @@ var Beethoven = function( youtubeClip_id, youtubePlayer_id ) {
         '5'  : 'cued'
     };
 
-    this.TIMER_INTERVAL = 200;
+    this.TIMER_INTERVAL = 100;
 
     // Properties 
     this.current = {
@@ -56,6 +59,11 @@ var Beethoven = function( youtubeClip_id, youtubePlayer_id ) {
         'mm' : 0,
         'xx' : 0
     };
+
+    this.performable = false;
+    this.currentTimestamp = 0;
+
+    this.LRCobjs = LRCobjs;
 
     this.timer = null;
     
@@ -98,31 +106,9 @@ Beethoven.prototype = {
         }
     },
 
-    increaseDuration : function() {
+    getLRCtime : function( time , isMiliseconds) {
 
-        // in miliseconds
-        var oldTime = ( ( this.current['mm'] * 60 ) + this.current['ss'] ) * 1000 + this.current['xx'];
-
-        oldTime += this.TIMER_INTERVAL;
-
-        this.current = this.getProcessedTime( oldTime , true);
-    },
-
-    /*
-     *  We have to reset timer when the player is PLAYING. In this way, we can get the correct duration
-     *  of this video.
-     */
-    resetDuration : function() {
-
-        var oldTime = this.youtubePlayer.getCurrentTime();
-        this.current = this.getProcessedTime( oldTime );
-
-        console.log( this.current );
-    },
-
-    getProcessedTime : function( time , isMiliseconds) {
-
-        if ( isMiliseconds === true) {
+        if ( isMiliseconds === true ) {
 
             // make time in seconds
             time /= 1000; 
@@ -137,20 +123,33 @@ Beethoven.prototype = {
         return newTime;
     },
 
-    startTimer : function() {
+    /*
+     *  We have to set a outside timer to update the currentTimestamp because 
+     *  Youtube's getCurrentTime() function is so weird that if you set an interval 
+     *  in 1 second to get the duration of the movie each second, you will find 
+     *  that the difference between each other is NOT 1 second. In this way, I 
+     *  have to set a timer to get the most correct time in the smallest and the most 
+     *  acceptable interval for the javascript timer.
+     */
+    setTimer : function() {
 
         var that = this;
 
         this.timer = window.setInterval(function() {
 
-            that.increaseDuration();
+            that.setCurrentTimestamp();
+            that.perform();
 
         }, this.TIMER_INTERVAL);
     },
 
-    stopTimer : function() {
+    setCurrentTimestamp : function() {
+        this.currentTimestamp = this.youtubePlayer.getCurrentTime() * 1000;
+    },
 
-        clearInterval( this.timer );
+    isPerformable : function() {
+
+        return this.performable;
     },
 
     isValidClip : function( id ) {
@@ -165,23 +164,39 @@ Beethoven.prototype = {
 
         this.youtubePlayer = $('#'+ youtubePlayer_id ).get(0);
         this.youtubePlayer.addEventListener('onStateChange', 'onYoutubeStateChange');
-
+        this.setTimer();
     },
 
     onYoutubeStateChange : function( state_code ) {
 
         if ( this.STATE[ state_code ] === 'playing' ) {
-            
-            this.resetDuration();
-            this.startTimer();
+
+            this.performable = true;
         }
         else if ( this.STATE[ state_code ] === 'paused' || this.STATE[ state_code ] === 'ended' ) {
 
-            console.log( this.current );
-            this.stopTimer();
+            this.performable = false;
+        }
+    },
+
+    /*
+     *  This is how Beethoven performs the amazing songs ;)
+     */
+    perform : function() {
+
+        if ( !this.isPerformable() ) return;
+
+        for (var i = 0; i < this.LRCobjs.length; i++ ) {
+
+            var o = this.LRCobjs[i];
+
+            // Find the FIRST lyric that timestamp is bigger than the current one
+            if ( this.currentTimestamp <= o['timestamp'] ) {
+                console.log( o['lyric'] );
+                break;
+            }
         }
     }
-
 };
 
 // The API will call this function when the player is fully loaded and the API is ready to receive calls
@@ -193,7 +208,7 @@ function onYouTubePlayerReady( youtubePlayer_id ) {
 
 function onYoutubeStateChange( state_code ) {
 
-    console.log( state_code );
+    console.log( 'status code : '+ state_code );
 
     // this means window
     return this.beethoven_ref.onYoutubeStateChange( state_code );
