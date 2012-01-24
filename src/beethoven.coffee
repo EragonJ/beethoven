@@ -1,3 +1,37 @@
+###
+   Beethoven - A music player which can control piano / guitar tabs when playing Youtube clips.
+  
+   Dependency :
+       jQuery.js
+       swfobject.js
+ 
+   Working Flow :
+       
+       ----------                                                 
+       | window |--- beethoven_ref ----> o
+       |---------
+ 
+       P.S. o is a beethoven instance, and window.beethoven_ref will be set up when o is initialized.
+ 
+       o <----------------------------------------------------------
+       |                                                           |
+       | If the clip is loaded                                     |
+       |                                                           |
+       v                                                           |                       
+      call onYouTubePlayerReady()                                  |
+       |                                                           |
+       |-- Set youtubePlayer property back through beethoven_ref ---
+ 
+           this.beethoven_ref.youtubePlayer = $('#'+ youtubePlayer_id ).get(0);
+                                                                  
+   ATTENTION:
+       
+       To test any of these calls, you must have your file running on a webserver,
+       as the Flash player restricts calls between local files and the internet.
+ 
+       XXX: It seems there is a small delay if you use timer to go through the interval (1s), 
+       then you will get different results not in 1s interval !!
+###
 Beethoven = ( youtubeClip_id, youtubePlayer_id, LRCobjs ) ->
 
     ###
@@ -51,6 +85,9 @@ Beethoven = ( youtubeClip_id, youtubePlayer_id, LRCobjs ) ->
 
 Beethoven.prototype =
 
+    ### 
+        This is a wrapper of swfobject.embedSWF, remember to pass necessary params shown below
+    ###
     embedYoutubePlayer : () ->
 
         swfobject.embedSWF(
@@ -95,6 +132,14 @@ Beethoven.prototype =
         return newTime
     ,
 
+    ### 
+        We have to set a outside timer to update the currentTimestamp because 
+        Youtube's getCurrentTime() function is so weird that if you set an interval 
+        in 1 second to get the duration of the movie each second, you will find 
+        that the difference between each other is NOT 1 second. In this way, I 
+        have to set a timer to get the most correct time in the smallest and the most 
+        acceptable interval for the javascript timer.
+    ###
     setTimer : () ->
 
         @timer = window.setInterval(() =>
@@ -121,6 +166,9 @@ Beethoven.prototype =
         return id.match(/^[a-zA-Z0-9\-]{11}$/)
     ,
 
+    ###
+        I extract the onYoutube* events into beethoven so that I can easily manipulate the properties    
+    ###
     onYouTubePlayerReady : ( youtubePlayer_id ) ->
 
         @youtubePlayer = $('#'+ youtubePlayer_id ).get(0)
@@ -143,6 +191,9 @@ Beethoven.prototype =
         return
     ,
 
+    ###
+        This is how Beethoven performs the amazing songs ;)
+    ###
     perform : () ->
 
         return false if not @isPerformable()
@@ -167,13 +218,17 @@ Beethoven.prototype =
         return
     ,
 
-onYouTubePlayerReady = ( youtubePlayer_id ) ->
+###
+    The API will call this function when the player is fully loaded and the API is ready to receive calls
+###
+window.onYouTubePlayerReady = ( youtubePlayer_id ) ->
 
     return @beethoven_ref.onYouTubePlayerReady( youtubePlayer_id )
 
-onYoutubeStateChange = ( state_code ) ->
+window.onYoutubeStateChange = ( state_code ) ->
 
     console.log( 'status code : ' + state_code )
 
     return this.beethoven_ref.onYoutubeStateChange( state_code )
 
+window.Beethoven = Beethoven
