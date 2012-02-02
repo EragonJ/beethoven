@@ -1,0 +1,30 @@
+!!!
+html
+    head
+        title
+        meta(http-equiv="Content-Type", content="text/html; charset=utf-8")
+        script(src="../lib/jquery.min.js")
+        script(src="../lib/swfobject.js")
+        script(src="../lib/LRCparser/LRCparser.js")
+        script(src="../beethoven.js")
+        script
+            $(document).ready( function() {
+
+                var parser = null;
+
+                $.getJSON('test.json', function( LRCsrc ) {
+
+                    parser = new LRCparser( LRCsrc );
+                    parser.parse();
+                    // console.log( parser.getLyrics() );
+                    // console.log( parser.getAlbumName() );
+
+                    var beethoven = new Beethoven('UYcoxhySXqk', 'ytapiplayer', parser.getLyrics());
+                    console.log( parser.getLyrics() );
+
+                });
+
+            });
+    body
+    div#ytapiplayer (Please update your flash version or try with another browser!)
+

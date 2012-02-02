@@ -1,0 +1,18 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head><title></title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><script src="../lib/jquery.min.js"></script><script src="../lib/swfobject.js"></script><script src="../lib/LRCparser/LRCparser.js"></script><script src="../beethoven.js"></script><script>$(document).ready( function() {
+
+    var parser = null;
+
+    $.getJSON('test.json', function( LRCsrc ) {
+
+        parser = new LRCparser( LRCsrc );
+        parser.parse();
+        // console.log( parser.getLyrics() );
+        // console.log( parser.getAlbumName() );
+
+        var beethoven = new Beethoven('UYcoxhySXqk', 'ytapiplayer', parser.getLyrics());
+        console.log( parser.getLyrics() );
+
+    });
+
+});
+</script></head><body></body><div id="ytapiplayer">(Please update your flash version or try with another browser!)</div></html>

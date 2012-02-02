@@ -1,40 +1,40 @@
-
-/*
-   Beethoven - A music player which can control piano / guitar tabs when playing Youtube clips.
-  
-   Dependency :
-       jQuery.js
-       swfobject.js
- 
-   Working Flow :
-       
-       ----------                                                 
-       | window |--- beethoven_ref ----> o
-       |---------
- 
-       P.S. o is a beethoven instance, and window.beethoven_ref will be set up when o is initialized.
- 
-       o <----------------------------------------------------------
-       |                                                           |
-       | If the clip is loaded                                     |
-       |                                                           |
-       v                                                           |                       
-      call onYouTubePlayerReady()                                  |
-       |                                                           |
-       |-- Set youtubePlayer property back through beethoven_ref ---
- 
-           this.beethoven_ref.youtubePlayer = $('#'+ youtubePlayer_id ).get(0);
-                                                                  
-   ATTENTION:
-       
-       To test any of these calls, you must have your file running on a webserver,
-       as the Flash player restricts calls between local files and the internet.
- 
-       XXX: It seems there is a small delay if you use timer to go through the interval (1s), 
-       then you will get different results not in 1s interval !!
-*/
-
 (function() {
+
+  /*
+     Beethoven - A music player which can control piano / guitar tabs when playing Youtube clips.
+    
+     Dependency :
+         jQuery.js
+         swfobject.js
+   
+     Working Flow :
+         
+         ----------                                                 
+         | window |--- beethoven_ref ----> o
+         |---------
+   
+         P.S. o is a beethoven instance, and window.beethoven_ref will be set up when o is initialized.
+   
+         o <----------------------------------------------------------
+         |                                                           |
+         | If the clip is loaded                                     |
+         |                                                           |
+         v                                                           |                       
+        call onYouTubePlayerReady()                                  |
+         |                                                           |
+         |-- Set youtubePlayer property back through beethoven_ref ---
+   
+             this.beethoven_ref.youtubePlayer = $('#'+ youtubePlayer_id ).get(0);
+                                                                    
+     ATTENTION:
+         
+         To test any of these calls, you must have your file running on a webserver,
+         as the Flash player restricts calls between local files and the internet.
+   
+         XXX: It seems there is a small delay if you use timer to go through the interval (1s), 
+         then you will get different results not in 1s interval !!
+  */
+
   var Beethoven;
 
   Beethoven = function(youtubeClip_id, youtubePlayer_id, LRCobjs) {
